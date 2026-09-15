@@ -65,7 +65,7 @@ docker volume create excalihub-data
 docker run -d \
   --name excalihub \
   --restart unless-stopped \
-  -p 127.0.0.1:3000:3000 \
+  -p 3000:3000 \
   -e APP_ORIGIN=http://localhost:3000 \
   -e COOKIE_SECURE=false \
   -v excalihub-data:/app/data \
@@ -87,7 +87,7 @@ services:
   excalihub:
     image: ghcr.io/mishankov/excalihub:latest
     ports:
-      - '127.0.0.1:3000:3000'
+      - '3000:3000'
     environment:
       APP_ORIGIN: http://localhost:3000
       COOKIE_SECURE: 'false'
@@ -107,7 +107,7 @@ docker compose up -d
 docker compose exec excalihub bun scripts/users.mjs create alice
 ```
 
-Visit http://localhost:3000. The named volume keeps accounts and drawings across container restarts. Docker binds to the loopback interface by default.
+Visit http://localhost:3000. The named volume keeps accounts and drawings across container restarts.
 
 For network access, put an HTTPS reverse proxy in front and set `APP_ORIGIN=https://your-domain.example` and `COOKIE_SECURE=true`. `APP_ORIGIN` must exactly match the browser origin, including its port when one is present, with no trailing slash. The proxy must preserve the Cookie and Origin headers.
 
@@ -128,7 +128,7 @@ npm run build
 APP_ORIGIN=http://localhost:3000 npm start
 ```
 
-Use `.env` (see `.env.example`) or environment variables to configure `DATABASE_PATH`, `APP_ORIGIN`, and `COOKIE_SECURE`. Start the server and run account commands with the same database path. The production app is a single Node process using SQLite; use a local persistent disk, not a network-mounted SQLite file.
+Use `.env` (see `.env.example`) or environment variables to configure `DATABASE_PATH`, `APP_ORIGIN`, and `COOKIE_SECURE`. Start the server and run account commands with the same database path. The production app is a single Bun process using SQLite; use a local persistent disk, not a network-mounted SQLite file.
 
 ## Storage and security
 
