@@ -28,6 +28,16 @@ The account command prompts for a password (at least 8 characters). Open http://
 
 Multiuser means separate accounts and private libraries. Live collaborative editing and shared diagrams are not included.
 
+## Screenshots
+
+### Light theme
+
+![Diagram library in the light theme](docs/screenshots/library-light.png)
+
+### Dark theme
+
+![Diagram library in the dark theme](docs/screenshots/library-dark.png)
+
 ## Manage accounts
 
 ```sh
@@ -40,14 +50,77 @@ Changing a password revokes that user's existing sessions. For automation, accou
 
 ## Production with Docker
 
+The published image supports `linux/amd64` and `linux/arm64`:
+
+```text
+ghcr.io/mishankov/excalihub:latest
+```
+
+### Docker
+
+Create a persistent volume and start the application:
+
+```sh
+docker volume create excalihub-data
+docker run -d \
+  --name excalihub \
+  --restart unless-stopped \
+  -p 127.0.0.1:3000:3000 \
+  -e APP_ORIGIN=http://localhost:3000 \
+  -e COOKIE_SECURE=false \
+  -v excalihub-data:/app/data \
+  ghcr.io/mishankov/excalihub:latest
+```
+
+Create the first account after the container starts:
+
+```sh
+docker exec -it excalihub node scripts/users.mjs create alice
+```
+
+### Docker Compose
+
+Save the following as `compose.yaml`:
+
+```yaml
+services:
+  excalihub:
+    image: ghcr.io/mishankov/excalihub:latest
+    ports:
+      - '127.0.0.1:3000:3000'
+    environment:
+      APP_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: 'false'
+      DATABASE_PATH: /app/data/excalihub.sqlite
+    volumes:
+      - diagrams:/app/data
+    restart: unless-stopped
+
+volumes:
+  diagrams:
+```
+
+Start the application and create the first account:
+
+```sh
+docker compose up -d
+docker compose exec excalihub node scripts/users.mjs create alice
+```
+
+Visit http://localhost:3000. The named volume keeps accounts and drawings across container restarts. Docker binds to the loopback interface by default.
+
+For network access, put an HTTPS reverse proxy in front and set `APP_ORIGIN=https://your-domain.example` and `COOKIE_SECURE=true`. `APP_ORIGIN` must exactly match the browser origin, including its port when one is present, with no trailing slash. The proxy must preserve the Cookie and Origin headers.
+
+### Build from source
+
+The Compose file included in this repository builds the image locally:
+
 ```sh
 docker compose up -d --build
 docker compose exec excalihub node scripts/users.mjs create alice
 ```
 
-Visit http://localhost:3000. The named `diagrams` volume keeps accounts and drawings across container restarts. Docker binds to the loopback interface by default. For network access, put an HTTPS reverse proxy in front and set `APP_ORIGIN=https://your-domain.example` and `COOKIE_SECURE=true` in the Compose environment. `APP_ORIGIN` must exactly match the browser origin (including port, with no trailing slash). The proxy must preserve the Cookie and Origin headers.
-
-Or run directly:
+To run directly without a container:
 
 ```sh
 npm ci
