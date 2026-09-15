@@ -75,7 +75,7 @@ docker run -d \
 Create the first account after the container starts:
 
 ```sh
-docker exec -it excalihub node scripts/users.mjs create alice
+docker exec -it excalihub bun scripts/users.mjs create alice
 ```
 
 ### Docker Compose
@@ -104,7 +104,7 @@ Start the application and create the first account:
 
 ```sh
 docker compose up -d
-docker compose exec excalihub node scripts/users.mjs create alice
+docker compose exec excalihub bun scripts/users.mjs create alice
 ```
 
 Visit http://localhost:3000. The named volume keeps accounts and drawings across container restarts. Docker binds to the loopback interface by default.
@@ -117,7 +117,7 @@ The Compose file included in this repository builds the image locally:
 
 ```sh
 docker compose up -d --build
-docker compose exec excalihub node scripts/users.mjs create alice
+docker compose exec excalihub bun scripts/users.mjs create alice
 ```
 
 To run directly without a container:
