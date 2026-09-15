@@ -1,0 +1,11 @@
+/node_modules/
+/.svelte-kit/
+/build/
+/coverage/
+/data/
+/static/excalidraw-assets/
+.env*
+!.env.example
+*.tsbuildinfo
+*.log
+.DS_Store
